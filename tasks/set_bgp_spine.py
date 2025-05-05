@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 from inventory.vars import *
+from tasks.netconf_locks import *
 from nornir import InitNornir
 from nornir.core.filter import F
-from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit
+from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit, netconf_validate
 from nornir_utils.plugins.functions import print_result
 
 
-# Define the number of spines. This could also come from Nornir inventory.
-
-def set_bgp(task, num_spines):
+def set_bgp_spine(task, num_leafs):
     """
     Configures point-to-point links on leaf switches connecting to spines.
     Assumes interfaces are TenGigabitEthernet1/0/1, 1/0/2, etc.,
@@ -16,11 +15,10 @@ def set_bgp(task, num_spines):
     Assigns unique IP addresses based on leaf node_id and spine index.
     """
     leaf_node_id = task.host["node_id"]
-    bgp_neighbor_base_combined = [] # List to hold XML config for each interface
+    bgp_neighbor_base_combined = []
     bgp_neighbor_l2vpn_evpn_combined = []
 
     for vyos_leaf in vyos_leafs:
-        # Construct XML payload fragment for this specific interface
         bgp_neighbor_base_config = f"""
               <neighbor>
                 <id>10.240.254.{vyos_leaf['node_id']}</id>
@@ -57,7 +55,6 @@ def set_bgp(task, num_spines):
         bgp_neighbor_l2vpn_evpn_combined.append(bgp_neighbor_l2vpn_evpn_config)
 
     for leaf_index in range(num_leafs):
-        # Construct XML payload fragment for this specific interface
         bgp_neighbor_base_config = f"""
               <neighbor>
                 <id>10.240.254.{leaf_index + 1}</id>
@@ -129,30 +126,20 @@ def set_bgp(task, num_spines):
       </config>
     """
 
-    result = task.run(netconf_edit_config, config=full_config_payload, target="running")
+    result = task.run(netconf_edit_config, config=full_config_payload, target="candidate", manager=task.host["manager"])
+
 
 
 
 def main():
-    # Initialize Nornir with your config.yaml pointing at inventory/*
-    # Make sure your inventory (e.g., inventory/hosts.yml) includes:
-    # 1. Devices in the 'leaf' group
-    # 2. A 'node_id' data variable for each leaf (e.g., node_id: 1)
     nr = InitNornir(config_file="config.yml")
 
-    # Filter for leaf devices
     nr_spines = nr.filter(F(groups__contains="spine"))
-    nr_s8 = nr.filter(hostname="10.20.0.8")
-
-    # Define the number of spines (can be made dynamic via inventory/config)
-
-    # Run the task on the filtered leaf devices, passing the number of spines
-    results = nr_s8.run(
-        task=set_bgp,
-        num_spines=num_spines
+    results = nr_spines.run(
+        task=set_bgp_spine,
+        num_leafs=num_leafs
     )
 
-    # Display the results
     print_result(results)
 
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from inventory.vars import *
+from tasks.netconf_locks import *
 from nornir import InitNornir
 from nornir.core.filter import F
-from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit
+from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit, netconf_validate
 from nornir_utils.plugins.functions import print_result
 
 
@@ -77,7 +78,8 @@ def system_config_payload(task):
       </config>
     """
 
-    result = task.run(netconf_edit_config, config=config_payload, target="running")
+    result = task.run(netconf_edit_config, config=config_payload, target="candidate")
+
 
 def main():
     # Initialize Nornir with your config.yaml pointing at inventory/*
@@ -87,7 +89,7 @@ def main():
     nr_s10 = nr.filter(hostname="10.20.0.10")
 
     # Run the NETCONF 'get-capabilities' RPC on all hosts
-    results = nr_leafs.run(task=system_config_payload)
+    results = nr.run(task=system_config_payload)
 
     # Display which devices successfully connected and their capabilities
     print_result(results)

@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 from inventory.vars import *
+from tasks.netconf_locks import *
 from nornir import InitNornir
 from nornir.core.filter import F
-from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit
+from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit, netconf_validate
 from nornir_utils.plugins.functions import print_result
 
 
 # Define the number of spines. This could also come from Nornir inventory.
 NUM_SPINES = 2
 
-def set_p2p_links(task, num_spines):
+def set_p2p_links_leaf(task, num_spines):
     """
     Configures point-to-point links on leaf switches connecting to spines.
     Assumes interfaces are TenGigabitEthernet1/0/1, 1/0/2, etc.,
@@ -155,7 +156,9 @@ def set_p2p_links(task, num_spines):
       </config>
     """
 
-    result = task.run(netconf_edit_config, config=full_config_payload, target="running")
+
+
+    result = task.run(netconf_edit_config, config=full_config_payload, target="candidate")
 
 
 
@@ -173,7 +176,7 @@ def main():
 
     # Run the task on the filtered leaf devices, passing the number of spines
     results = nr_leafs.run(
-        task=set_p2p_links,
+        task=set_p2p_links_leaf,
         num_spines=num_spines
     )
 
