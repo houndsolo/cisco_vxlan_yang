@@ -18,6 +18,52 @@ def set_p2p_links(task, num_leafs):
     spine_node_id = task.host["node_id"]
     leaf_interface_snippet = [] # List to hold XML config for each interface
 
+    for vyos_leaf in vyos_leafs:
+
+        spine_p2p_ip = f"10.240.{vyos_leaf['node_id']}{spine_node_id}.0"
+        p2p_ip_mask = "255.255.255.254"
+
+        for connection in vyos_leaf["spine_connections"]:
+            if connection["spine_id"] == spine_node_id:
+                vyos_leaf_fragment = f"""
+                    <TenGigabitEthernet>
+                      <name>{connection['interface']}</name>
+                      <description>p2p link to leaf {vyos_leaf['hostname']}</description>
+                      <switchport-conf>
+                        <switchport>false</switchport>
+                      </switchport-conf>
+                      <ip>
+                        <address>
+                          <primary>
+                            <address>{spine_p2p_ip}</address>
+                            <mask>{p2p_ip_mask}</mask>
+                          </primary>
+                        </address>
+                        <router-ospf xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-ospf">
+                          <ospf>
+                            <process-id>
+                              <id>1</id>
+                              <area>
+                                <area-id>0</area-id>
+                              </area>
+                            </process-id>
+                            <network>
+                              <point-to-point/>
+                            </network>
+                          </ospf>
+                        </router-ospf>
+                        <pim>
+                          <pim-mode-choice-cfg xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-multicast">
+                            <sparse-mode/>
+                          </pim-mode-choice-cfg>
+                        </pim>
+                      </ip>
+                    </TenGigabitEthernet>
+                """
+                leaf_interface_snippet.append(vyos_leaf_fragment)
+                break
+
+    # Construct XML payload fragment for this specific interface
     for leaf_index in range(num_leafs):
         interface_port = leaf_index + 1
         spine_p2p_ip = f"10.240.{leaf_index+1}{spine_node_id}.0"
@@ -25,7 +71,6 @@ def set_p2p_links(task, num_leafs):
         spine_loopback_ip2 = f"10.240.253.{spine_node_id}" #MSDP
         p2p_ip_mask = "255.255.255.254"
 
-        # Construct XML payload fragment for this specific interface
         interface_xml_fragment = f"""
             <TenGigabitEthernet>
               <name>1/0/{interface_port}</name>
@@ -164,7 +209,7 @@ def main():
     nr_spines = nr.filter(F(groups__contains="spine"))
     nr_s8 = nr.filter(hostname="10.20.0.8")
 
-    results = nr_s8.run(
+    results = nr_spines.run(
         task=set_p2p_links,
         num_leafs=num_leafs
     )
