@@ -21,7 +21,7 @@ Virtual VyOS Leaves are defined in `inventory/vars.py` `vyos_leafs` with attribu
 - host_node
 - node_id
 - spine_connections
- - spine_id, interface - explicitly define which port each hypervisor is connected to
+  - spine_id, interface - explicitly define which port each hypervisor is connected to
 
 
 ## Scripts
