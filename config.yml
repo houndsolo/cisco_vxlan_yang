@@ -1,0 +1,14 @@
+---
+inventory:
+  plugin: AnsibleInventory
+  options:
+    hostsfile: "inventory/hosts.yml"
+
+ssh:
+  config_file: "~/.ssh/config"
+
+runner:
+  plugin: threaded
+  options:
+    num_workers: 16  # Number of parallel threads
+
