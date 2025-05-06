@@ -6,6 +6,62 @@ from nornir.core.filter import F
 from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netconf_commit, netconf_validate
 from nornir_utils.plugins.functions import print_result
 
+def system_vlan_payload(task):
+    if "leaf" in task.host.groups:
+        vlan_evpn_config = """
+        <configuration-entry xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+          <vlan-id>6</vlan-id>
+          <member>
+            <evi-member>
+              <evpn-instance/>
+            </evi-member>
+          </member>
+        </configuration-entry>
+        <configuration xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+          <vlan-id>6</vlan-id>
+        </configuration>
+        """
+
+    vlan_configuration = f"""
+     <vlan>
+       {locals().get("vlan_evpn_config", "")}
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>2</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>3</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>4</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>5</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>7</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>8</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>9</id>
+       </vlan-list>
+       <vlan-list xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-vlan">
+         <id>20</id>
+         <name>mgmt</name>
+       </vlan-list>
+     </vlan>
+    """
+
+    config_payload = f"""
+      <config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+          {vlan_configuration}
+        </native>
+      </config>
+    """
+
+    result = task.run(netconf_edit_config, config=config_payload, target="candidate")
 
 def system_config_payload(task):
     """set system settings"""

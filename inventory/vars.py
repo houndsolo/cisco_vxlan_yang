@@ -4,6 +4,7 @@ system_mtu = 9169
 monitoring_vlan = 5
 monitoring_vlan_subnet_mask = "255.255.0.0"
 
+bgp_as = 700
 bgp_leaf_as = 700
 bgp_spine_as = 700
 
