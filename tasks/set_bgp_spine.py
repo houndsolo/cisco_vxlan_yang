@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from inventory.vars import *
+from inventory.vyos_leafs import *
 from tasks.netconf_locks import *
 from nornir import InitNornir
 from nornir.core.filter import F
@@ -19,10 +20,11 @@ def set_bgp_spine(task, num_leafs):
     bgp_neighbor_l2vpn_evpn_combined = []
 
     for vyos_leaf in vyos_leafs:
+        vyos_bgp_peer_ip = f"10.240.254.{vyos_leaf['node_id']}"
         bgp_neighbor_base_config = f"""
               <neighbor>
-                <id>10.240.254.{vyos_leaf['node_id']}</id>
-                <remote-as>700</remote-as>
+                <id>{vyos_bgp_peer_ip}</id>
+                <remote-as>{bgp_leaf_as}</remote-as>
                 <ebgp-multihop-v2>
                   <enable/>
                   <max-hop>4</max-hop>
@@ -40,7 +42,7 @@ def set_bgp_spine(task, num_leafs):
         bgp_neighbor_base_combined.append(bgp_neighbor_base_config)
         bgp_neighbor_l2vpn_evpn_config = f"""
                       <neighbor>
-                        <id>10.240.254.{vyos_leaf['node_id']}</id>
+                        <id>{vyos_bgp_peer_ip}</id>
                         <activate/>
                         <route-reflector-client/>
                         <send-community-v2>
@@ -55,10 +57,11 @@ def set_bgp_spine(task, num_leafs):
         bgp_neighbor_l2vpn_evpn_combined.append(bgp_neighbor_l2vpn_evpn_config)
 
     for leaf_index in range(num_leafs):
+        leaf_bgp_peer_ip = f"10.240.254.{leaf_index + 1}"
         bgp_neighbor_base_config = f"""
               <neighbor>
-                <id>10.240.254.{leaf_index + 1}</id>
-                <remote-as>700</remote-as>
+                <id>{leaf_bgp_peer_ip}</id>
+                <remote-as>{bgp_leaf_as}</remote-as>
                 <ebgp-multihop-v2>
                   <enable/>
                   <max-hop>4</max-hop>
@@ -96,7 +99,7 @@ def set_bgp_spine(task, num_leafs):
         <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
           <router>
             <bgp xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-bgp">
-              <id>700</id>
+              <id>{bgp_spine_as}</id>
               <bgp>
                 <default>
                   <ipv4-unicast>false</ipv4-unicast>

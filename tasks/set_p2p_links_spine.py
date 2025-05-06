@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from inventory.vars import *
+from inventory.vyos_leafs import *
 from tasks.netconf_locks import *
 from nornir import InitNornir
 from nornir.core.filter import F
@@ -184,7 +185,7 @@ def set_p2p_links_spine(task, num_leafs):
                   <id>1</id>
                   <redistribute>
                     <bgp>
-                      <as>700</as>
+                      <as>{bgp_spine_as}</as>
                     </bgp>
                   </redistribute>
                   <router-id>{spine_loopback_ip}</router-id>

@@ -7,9 +7,6 @@ from nornir_netconf.plugins.tasks import netconf_edit_config, netconf_lock, netc
 from nornir_utils.plugins.functions import print_result
 
 
-# Define the number of spines. This could also come from Nornir inventory.
-NUM_SPINES = 2
-
 def set_p2p_links_leaf(task, num_spines):
     """
     Configures point-to-point links on leaf switches connecting to spines.
@@ -18,16 +15,16 @@ def set_p2p_links_leaf(task, num_spines):
     Assigns unique IP addresses based on leaf node_id and spine index.
     """
     leaf_node_id = task.host["node_id"]
-    config_fragments = [] # List to hold XML config for each interface
+    config_fragments = []
+
+    leaf_loopback_ip = f"10.240.254.{leaf_node_id}"
+    leaf_loopback_ip2 = f"10.240.250.{leaf_node_id}"
+    p2p_ip_mask = "255.255.255.254"
 
     for spine_index in range(num_spines):
         interface_port = spine_index + 1
         leaf_p2p_ip = f"10.240.{leaf_node_id}{spine_index+1}.1"
-        leaf_loopback_ip = f"10.240.254.{leaf_node_id}"
-        leaf_loopback_ip2 = f"10.240.250.{leaf_node_id}"
-        p2p_ip_mask = "255.255.255.254"
 
-        # Construct XML payload fragment for this specific interface
         interface_xml_fragment = f"""
             <TenGigabitEthernet>
               <name>1/0/{interface_port}</name> <!-- Use standard slot/module/port format -->
@@ -127,6 +124,7 @@ def set_p2p_links_leaf(task, num_spines):
          </ip>
        </Loopback>
     """
+    config_fragments.append(loopback_config)
 
     # Combine all interface fragments into one complete config payload
     # The <interface> tag itself can contain multiple interface definitions
@@ -140,16 +138,15 @@ def set_p2p_links_leaf(task, num_spines):
                   <id>1</id>
                   <redistribute>
                     <bgp>
-                      <as>700</as>
+                      <as>{bgp_leaf_as}</as>
                     </bgp>
                   </redistribute>
-                  <router-id>10.240.254.{leaf_node_id}</router-id>
+                  <router-id>{leaf_loopback_ip}</router-id>
                 </process-id>
               </ospf>
             </router-ospf>
           </router>
           <interface>
-          {loopback_config}
           {''.join(config_fragments)}
           </interface>
         </native>

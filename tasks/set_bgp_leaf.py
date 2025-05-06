@@ -21,11 +21,13 @@ def set_bgp_leaf(task, num_spines):
     bgp_neighbor_l2vpn_evpn_combined = []
 
     for spine_index in range(num_spines):
+        spine_bgp_peering_ip = f"10.240.255.{spine_index + 1}"
+
         # Construct XML payload fragment for this specific interface
         bgp_neighbor_base_config = f"""
               <neighbor>
                 <id>10.240.255.{spine_index + 1}</id>
-                <remote-as>700</remote-as>
+                <remote-as>{bgp_spine_as}</remote-as>
                 <ebgp-multihop-v2>
                   <enable/>
                   <max-hop>4</max-hop>
@@ -44,7 +46,7 @@ def set_bgp_leaf(task, num_spines):
 
         bgp_neighbor_l2vpn_evpn_config = f"""
                       <neighbor>
-                        <id>10.240.255.{spine_index + 1}</id>
+                        <id>{spine_bgp_peering_ip}</id>
                         <activate/>
                         <send-community-v2>
                           <send-community-where>both</send-community-where>
@@ -108,7 +110,7 @@ def set_bgp_leaf(task, num_spines):
             {l2vpn_evpn_config}
           <router>
             <bgp xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-bgp">
-              <id>700</id>
+              <id>{bgp_leaf_as}</id>
               <bgp>
                 <default>
                   <ipv4-unicast>false</ipv4-unicast>

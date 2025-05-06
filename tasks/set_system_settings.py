@@ -21,9 +21,9 @@ def system_config_payload(task):
               <instance-range>
                 <id>0</id>
                 <priority-root>
-                  <priority>61440</priority>
+                  <priority>{spanning_tree_priority}</priority>
                 </priority-root>
-                <priority>61440</priority>
+                <priority>{spanning_tree_priority}</priority>
               </instance-range>
             </mst>
             <mode xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-spanning-tree">mst</mode>
@@ -35,7 +35,7 @@ def system_config_payload(task):
           </vtp>
           <system>
             <mtu xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-switch">
-              <size>9169</size>
+              <size>{system_mtu}</size>
             </mtu>
           </system>
           <errdisable>
