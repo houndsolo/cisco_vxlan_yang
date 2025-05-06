@@ -10,10 +10,6 @@ from nornir_utils.plugins.functions import print_result
 
 from tasks.netconf_locks        import  global_lock, global_unlock
 from tasks.set_system_settings  import  system_config_payload, system_vlan_payload
-from tasks.set_bgp_leaf         import  set_bgp_leaf
-from tasks.set_bgp_spine        import  set_bgp_spine
-from tasks.set_p2p_links_leaf   import  set_p2p_links_leaf
-from tasks.set_p2p_links_spine  import  set_p2p_links_spine
 from tasks.set_p2p_links        import  set_p2p_links
 from tasks.set_bgp              import  set_bgp
 
