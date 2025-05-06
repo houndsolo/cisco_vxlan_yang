@@ -56,7 +56,7 @@ def set_bgp(task, num_spines, num_leafs):
 
         #evpn config
         l2vpn_evpn_config = f"""
-              <l2vpn>
+              <l2vpn xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" nc:operation="replace">
                 <evpn_cont xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-l2vpn">
                   <evpn>
                     <replication-type>

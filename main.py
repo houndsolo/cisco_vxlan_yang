@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import time
 from inventory.vars import *
 from inventory.vyos_leafs import *
 
@@ -19,12 +19,6 @@ from tasks.set_bgp              import  set_bgp
 
 
 def configure_vxlan(task,num_leafs,num_spines):
-    # set vlans first, EVI instance needs to be configured first
-    task.run(task=global_lock)
-    task.run(task=system_vlan_payload)
-    task.run(netconf_validate)
-    task.run(netconf_commit, manager=task.host["manager"])
-    task.run(task=global_unlock)
 
 
     # rest of evpn vxlan config
@@ -70,13 +64,26 @@ def configure_vxlan(task,num_leafs,num_spines):
 
     task.run(task=global_unlock)
 
+    """
+    do vlans separately?
+    need EVPN profile configured first before adding VLAN to EVPN-Member
+    """
+    #time.sleep(3)
+
+    ## set vlans last, EVI instance needs to be configured first
+    #task.run(task=global_lock)
+    #task.run(task=system_vlan_payload)
+    #task.run(netconf_validate)
+    #task.run(netconf_commit, manager=task.host["manager"])
+    #task.run(task=global_unlock)
+
 def main():
     nr = InitNornir(config_file="config.yml")
 #    nr_spines = nr.filter(F(groups__contains="spine"))
     nr_leafs = nr.filter(F(groups__contains="leaf"))
 #    nr_s7 = nr.filter(hostname="10.20.0.7")
 
-    results = nr_leafs.run(task=configure_vxlan, num_spines=num_spines, num_leafs=num_leafs)
+    results = nr.run(task=configure_vxlan, num_spines=num_spines, num_leafs=num_leafs)
     print_result(results)
 
 if __name__ == "__main__":
