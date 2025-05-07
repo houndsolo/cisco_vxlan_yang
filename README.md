@@ -28,10 +28,8 @@ Virtual VyOS Leaves are defined in `inventory/vars.py` `vyos_leafs` with attribu
 
 - `main.py` – Orchestrates configuration deployment.
 - `set_banner.py` – Sets system-wide configuration.
-- `set_bgp_leaf.py` – Configures BGP and EVPN on leaf switches.
-- `set_bgp_spine.py` – Configures BGP on spine switches.
-- `set_p2p_links_leaf.py` – Configures point-to-point links on leaf switches.
-- `set_p2p_links_spine.py` – Configures point-to-point links on spine switches.
+- `set_bgp.py` – Configures BGP and EVPN.
+- `set_p2p_links.py` – Configures point-to-point links.
 
 ## Requirements
 
