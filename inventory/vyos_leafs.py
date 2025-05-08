@@ -6,7 +6,10 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/14"},
             {"spine_id": 2, "interface": "1/0/8"}
-        ]
+        ],
+        "leaf_connections": [
+            {"leaf_id": 1, "interface": "1/0/6"},
+        ],
     },
     {
         "hostname": "vtep-fortuna",
@@ -15,7 +18,9 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/5"},
             {"spine_id": 2, "interface": "1/0/13"}
-        ]
+        ],
+        "leaf_connections": [
+        ],
     },
     {
         "hostname": "vtep-macbeth",
@@ -24,7 +29,10 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/15"},
             {"spine_id": 2, "interface": "1/0/6"}
-        ]
+        ],
+        "leaf_connections": [
+            {"leaf_id": 1, "interface": "1/0/8"},
+        ],
     },
     {
         "hostname": "vtep-titania",
@@ -33,7 +41,10 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/13"},
             {"spine_id": 2, "interface": "1/0/5"}
-        ]
+        ],
+        "leaf_connections": [
+            {"leaf_id": 1, "interface": "1/0/5"},
+        ],
     },
     {
         "hostname": "vtep-zoness",
@@ -42,7 +53,9 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/6"},
             {"spine_id": 2, "interface": "1/0/15"}
-        ]
+        ],
+        "leaf_connections": [
+        ],
     },
     {
         "hostname": "vtep-venom",
@@ -51,7 +64,10 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/16"},
             {"spine_id": 2, "interface": "1/0/7"}
-        ]
+        ],
+        "leaf_connections": [
+            {"leaf_id": 1, "interface": "1/0/7"},
+        ],
     },
     {
         "hostname": "vtep-eldarad",
@@ -60,7 +76,10 @@ vyos_leafs = [
         "spine_connections": [
             {"spine_id": 1, "interface": "1/0/7"},
             {"spine_id": 2, "interface": "1/0/16"}
-        ]
+        ],
+        "leaf_connections": [
+            {"leaf_id": 2, "interface": "1/0/6"},
+        ],
     },
 ]
 
